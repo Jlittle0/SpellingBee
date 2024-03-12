@@ -22,7 +22,7 @@ import java.util.Scanner;
  * It utilizes recursion to generate the strings, mergesort to sort them, and
  * binary search to find them in a dictionary.
  *
- * @author Zach Blick, [ADD YOUR NAME HERE]
+ * @author Zach Blick, Josh Little
  *
  * Written on March 5, 2023 for CS2 @ Menlo School
  *
@@ -44,13 +44,68 @@ public class SpellingBee {
     //  Store them all in the ArrayList words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void generate() {
-        // YOUR CODE HERE — Call your recursive method!
+        substring("", letters, 0);
+    }
+    public void substring(String currentString, String letters, int location) {
+        if (letters.isEmpty() || location == letters.length()) {
+            permute("", currentString);
+            return;
+        }
+        substring(currentString, letters, location + 1);
+        substring(currentString + letters.substring(location, location + 1), letters, location + 1);
+    }
+
+    public void permute(String word, String letters) {
+        if (letters.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < letters.length(); i++) {
+            words.add(word + letters.substring(i, i +1));
+            permute(word + letters.substring(i, i +1), letters.substring(0, i) + letters.substring(i + 1, letters.length()));
+        }
     }
 
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void sort() {
-        // YOUR CODE HERE
+        words = mergeSort(words, 0 , words.size());
+    }
+
+    public ArrayList<String> mergeSort(ArrayList<String> words, int low, int high) {
+         if (low == high) {
+            ArrayList<String> tempArr = new ArrayList<String>();
+            if (low == words.size()) {
+                tempArr.add(words.get(low - 1));
+                return tempArr;
+            }
+            tempArr.add(words.get(low));
+            return tempArr;
+        }
+
+        int mid = (high + low) / 2;
+        ArrayList<String> arr1 =  mergeSort(words, low, mid);
+        ArrayList<String> arr2 = mergeSort(words, mid + 1, high);
+        return merge(arr1, arr2);
+    }
+
+    public ArrayList<String> merge(ArrayList<String> arr1, ArrayList<String> arr2) {
+        ArrayList<String> stuff = new ArrayList<String>();
+        int i = 0, j = 0;
+        while (i < arr1.size() && j < arr2.size()) {
+            if (arr1.get(i).compareTo(arr2.get(j)) >= 0) {
+                stuff.add(arr2.get(j++));
+            }
+            else if (arr1.get(i).compareTo(arr2.get(j)) < 0) {
+                stuff.add(arr1.get(i++));
+            }
+        }
+        while (i >= arr1.size() && j < arr2.size()) {
+            stuff.add(arr2.get(j++));
+        }
+        while (i < arr1.size() && j >= arr2.size()) {
+            stuff.add(arr1.get(i++));
+        }
+        return stuff;
     }
 
     // Removes duplicates from the sorted list.
